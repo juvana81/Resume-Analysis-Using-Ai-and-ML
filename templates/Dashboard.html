@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Analytics Dashboard</title>
+    <link rel="stylesheet" href="static/css/dashboard.css">
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+
+
+    <nav>
+        <a href="#" class="logo">ResumeAI</a>
+        <div class="nav-links">
+            <a href="/input">Placement Prediction</a>
+            <a href="/profile">View Profile</a>
+            <a href="/report">Report</a>
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#contact">Contact</a>
+        </div>
+    </nav>
+    <div class="dashboard-container">
+        <header>
+            <h1>Student Analytics Dashboard</h1>
+            <p style="color: #ffffff; font-size: 16px;">
+                This analysis displays the placement trends of over <strong>400 engineering students</strong> based on various factors such as 
+                <strong>CGPA, number of internships, number of projects</strong>, and proficiency in skills like 
+                <code>Python</code>, <code>Java</code>, <code>SQL</code>, <code>Machine Learning</code>, <code>AI</code>, 
+                <code>HTML</code>, <code>CSS</code>, <code>C++</code>, <code>React</code>, and <code>Node.js</code>.
+              </p>
+        </header>
+    
+  
+        <!-- Filters Section -->
+        <section class="filters-section">
+            <h2>Filters</h2>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="cgpa-min">CGPA Range:</label>
+                    <div class="range-inputs">
+                        <input type="number" id="cgpa-min" min="0" max="10" step="0.1" value="0" placeholder="Min">
+                        <span>-</span>
+                        <input type="number" id="cgpa-max" min="0" max="10" step="0.1" value="10" placeholder="Max">
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label for="internship-filter">Internship:</label>
+                    <select id="internship-filter">
+                        <option value="all">All</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="projects-filter">Projects:</label>
+                    <select id="projects-filter">
+                        <option value="all">All</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="placement-filter">Placement Status:</label>
+                    <select id="placement-filter">
+                        <option value="all">All</option>
+                        <option value="yes">Placed</option>
+                        <option value="no">Not Placed</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <button id="reset-filters" class="reset-btn">Reset Filters</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Navigation Tabs -->
+        <nav class="dashboard-tabs">
+            <button class="tab-btn active" data-tab="overview">Overview</button>
+            <button class="tab-btn" data-tab="cgpa">CGPA Analysis</button>
+            <button class="tab-btn" data-tab="skills">Skills</button>
+            <button class="tab-btn" data-tab="placement">Placement</button>
+        </nav>
+        
+        <!-- Key Metrics -->
+        <section class="key-metrics">
+            <div class="metric-card">
+                <p class="metric-label">Total Students</p>
+                <p class="metric-value" id="total-students">0</p>
+            </div>
+            <div class="metric-card">
+                <p class="metric-label">Placement Rate</p>
+                <p class="metric-value" id="placement-rate">0%</p>
+            </div>
+            <div class="metric-card">
+                <p class="metric-label">Average CGPA</p>
+                <p class="metric-value" id="avg-cgpa">0.00</p>
+            </div>
+            <div class="metric-card">
+                <p class="metric-label">With Internships</p>
+                <p class="metric-value" id="with-internships">0 (0%)</p>
+            </div>
+        </section>
+        
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Overview Tab -->
+            <section id="overview-tab" class="tab-pane active">
+                <div class="chart-grid">
+                    <div class="chart-card">
+                        <h3>CGPA Distribution</h3>
+                        <canvas id="cgpa-distribution-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Skills Distribution</h3>
+                        <canvas id="skills-distribution-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Internship vs Placement</h3>
+                        <canvas id="internship-placement-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Projects vs Placement</h3>
+                        <canvas id="projects-placement-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- CGPA Analysis Tab -->
+            <section id="cgpa-tab" class="tab-pane">
+                <div class="chart-grid">
+                    <div class="chart-card wide">
+                        <h3>CGPA vs Placement</h3>
+                        <canvas id="cgpa-placement-scatter"></canvas>
+                    </div>
+                    <div class="chart-card wide">
+                        <h3>Placement Rate by CGPA Range</h3>
+                        <canvas id="placement-by-cgpa-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>CGPA Distribution</h3>
+                        <canvas id="cgpa-distribution-bar"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>CGPA Distribution (%)</h3>
+                        <canvas id="cgpa-distribution-pie"></canvas>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Skills Tab -->
+            <section id="skills-tab" class="tab-pane">
+                <div class="chart-grid">
+                    <div class="chart-card wide">
+                        <h3>Skills Distribution</h3>
+                        <canvas id="skills-bar-chart"></canvas>
+                    </div>
+                    <div class="chart-card wide">
+                        <h3>Skills Distribution (%)</h3>
+                        <canvas id="skills-pie-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Placement Tab -->
+            <section id="placement-tab" class="tab-pane">
+                <div class="chart-grid">
+                    <div class="chart-card">
+                        <h3>Placement Status</h3>
+                        <canvas id="placement-status-pie"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Placement Rate by CGPA Range</h3>
+                        <canvas id="placement-cgpa-bar"></canvas>
+                    </div>
+                    <div class="chart-card wide">
+                        <h3>Factors Affecting Placement</h3>
+                        <div class="factors-grid">
+                            <div>
+                                <h4>Internship Impact</h4>
+                                <canvas id="internship-impact-chart"></canvas>
+                            </div>
+                            <div>
+                                <h4>Projects Impact</h4>
+                                <canvas id="projects-impact-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+    <script src="static/js/dashboard.js"></script>
+</body>
+</html>

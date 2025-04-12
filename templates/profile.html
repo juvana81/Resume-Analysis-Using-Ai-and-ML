@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - ResumeAI</title>
+  <style>
+    :root {
+      --primary: #6a1b9a;
+      --primary-light: #9c4dcc;
+      --primary-dark: #38006b;
+      --white: #ffffff;
+      --gray-light: #f5f5f5;
+      --gray: #e0e0e0;
+      --black: #212121;
+      --text-gray: #757575;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: var(--gray-light);
+      color: var(--black);
+      line-height: 1.6;
+    }
+    
+    header {
+      background: linear-gradient(to right, var(--primary-dark), var(--primary));
+      color: var(--white);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--white);
+      text-decoration: none;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+    
+    .nav-links a {
+      color: var(--white);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      padding: 0.5rem 0;
+    }
+    
+    .nav-links a:hover {
+      color: var(--gray);
+    }
+    
+    .nav-links a.active {
+      border-bottom: 2px solid var(--white);
+    }
+    
+    .cta-button {
+      background-color: var(--white);
+      color: var(--primary);
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .cta-button:hover {
+      background-color: var(--gray);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .main-content {
+      padding: 2rem 0;
+    }
+    
+    .profile-header {
+      background-color: var(--white);
+      border-radius: 10px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .profile-image {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background-color: var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-size: 3rem;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+    
+    .profile-info {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .profile-name {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      color: var(--primary-dark);
+    }
+    
+    .profile-title {
+      font-size: 1.2rem;
+      color: var(--text-gray);
+      margin-bottom: 1rem;
+    }
+    
+    .profile-metrics {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .metric {
+      background-color: var(--gray-light);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      color: var(--primary);
+      font-weight: 500;
+    }
+    
+    .metric span {
+      font-weight: bold;
+    }
+    
+    .profile-actions {
+      margin-left: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-width: 150px;
+    }
+    
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 2rem;
+    }
+    
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+    
+    .card {
+      background-color: var(--white);
+      border-radius: 10px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .card-title {
+      font-size: 1.3rem;
+      margin-bottom: 1.5rem;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .card-title a {
+      font-size: 0.9rem;
+      color: var(--primary);
+      text-decoration: none;
+    }
+    
+    .progress-item {
+      margin-bottom: 1.5rem;
+    }
+    
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+    
+    .progress-label {
+      font-weight: 500;
+    }
+    
+    .progress-value {
+      color: var(--text-gray);
+    }
+    
+    .progress-bar {
+      height: 8px;
+      background-color: var(--gray);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(to right, var(--primary), var(--primary-light));
+      border-radius: 4px;
+    }
+    
+    .skills-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+    
+    .skill-tag {
+      background-color: var(--gray-light);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+    }
+    
+    .skill-tag.highlight {
+      background-color: var(--primary-light);
+      color: var(--white);
+    }
+    
+    .skill-tag.missing {
+      border: 1px dashed var(--primary);
+      background-color: transparent;
+      color: var(--primary);
+    }
+    
+    .placement-chart {
+      height: 200px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin: 2rem 0;
+    }
+    
+    .chart-bar {
+      flex: 1;
+      margin: 0 3px;
+      background: linear-gradient(to top, var(--primary-dark), var(--primary-light));
+      border-radius: 4px 4px 0 0;
+      position: relative;
+    }
+    
+    .chart-label {
+      position: absolute;
+      bottom: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+    
+    .activity-item {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+    
+    .activity-icon {
+      width: 40px;
+      height: 40px;
+      background-color: var(--primary-light);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-size: 1rem;
+      z-index: 2;
+      flex-shrink: 0;
+    }
+    
+    .activity-content {
+      flex: 1;
+    }
+    
+    .activity-title {
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+    }
+    
+    .activity-time {
+      font-size: 0.8rem;
+      color: var(--text-gray);
+    }
+    
+    .activity-line {
+      position: absolute;
+      left: 20px;
+      top: 40px;
+      bottom: -40px;
+      width: 2px;
+      background-color: var(--gray);
+      z-index: 1;
+    }
+    
+    .activity-item:last-child .activity-line {
+      display: none;
+    }
+    
+    .recommendations .card {
+      margin-bottom: 2rem;
+    }
+    
+    .recommendation-item {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--gray);
+    }
+    
+    .recommendation-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    
+    .recommendation-icon {
+      width: 50px;
+      height: 50px;
+      background-color: var(--gray-light);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    
+    .recommendation-content {
+      flex: 1;
+    }
+    
+    .recommendation-title {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    
+    .recommendation-description {
+      font-size: 0.9rem;
+      color: var(--text-gray);
+      margin-bottom: 1rem;
+    }
+    
+    .recommendation-action {
+      font-size: 0.9rem;
+      color: var(--primary);
+      font-weight: 500;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .company-suggestions {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+    
+    .company-card {
+      background-color: var(--white);
+      border-radius: 10px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .company-header {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .company-logo {
+      width: 50px;
+      height: 50px;
+      background-color: var(--gray-light);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: var(--primary);
+    }
+    
+    .company-info h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.3rem;
+    }
+    
+    .company-info p {
+      font-size: 0.9rem;
+      color: var(--text-gray);
+    }
+    
+    .company-match {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+    }
+    
+    .match-score {
+      font-weight: bold;
+      color: var(--primary);
+    }
+    
+    .company-actions {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .company-action {
+      flex: 1;
+      padding: 0.5rem;
+      text-align: center;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    
+    .company-action.primary {
+      background-color: var(--primary);
+      color: var(--white);
+    }
+    
+    .company-action.secondary {
+      background-color: var(--gray-light);
+      color: var(--black);
+    }
+    
+    footer {
+      background-color: var(--black);
+      color: var(--white);
+      padding: 3rem 0;
+      margin-top: 3rem;
+    }
+    
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+    
+    .footer-section {
+      flex: 1;
+      min-width: 240px;
+    }
+    
+    .footer-title {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--white);
+    }
+    
+    .footer-links {
+      list-style: none;
+    }
+    
+    .footer-links li {
+      margin-bottom: 0.8rem;
+    }
+    
+    .footer-links a {
+      color: var(--gray);
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    
+    .footer-links a:hover {
+      color: var(--white);
+    }
+    
+    .social-links {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    
+    .social-icon {
+      width: 40px;
+      height: 40px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    
+    .social-icon:hover {
+      background-color: var(--primary-light);
+    }
+    
+    .copyright {
+      text-align: center;
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--gray);
+    }
+    
+    @media (max-width: 992px) {
+      .profile-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+      
+      .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      
+      .profile-actions {
+        margin-left: 0;
+        flex-direction: row;
+        width: 100%;
+      }
+      
+      .profile-actions button {
+        flex: 1;
+      }
+      
+      .company-suggestions {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <a href="index.html" class="logo">ResumeAI</a>
+        <div class="nav-links">
+          <a href="#" class="active">Profile</a>
+          <a href="report.html">Report</a>
+          <a href="analyze.html">Analyze Resume</a>
+          <a href="#contact">Contact</a>
+        </div>
+        <button class="cta-button">Update Resume</button>
+      </nav>
+    </div>
+  </header>
+  
+  <div class="main-content">
+    <div class="container">
+      <div class="profile-header">
+        <div class="profile-image">JS</div>
+        <div class="profile-info">
+          <h1 class="profile-name">John Smith</h1>
+          <p class="profile-title">Computer Science Student • University of Technology</p>
+          <div class="profile-metrics">
+            <div class="metric">CGPA: <span>3.8/4.0</span></div>
+            <div class="metric">Placement Score: <span>78/100</span></div>
+            <div class="metric">Skills: <span>24</span></div>
+          </div>
+        </div>
+        <div class="profile-actions">
+          <button class="cta-button">Download Profile</button>
+          <button class="cta-button" style="background-color: transparent; border: 1px solid var(--primary); color: var(--primary);">Share Profile</button>
+        </div>
+      </div>
+      
+      <div class="profile-grid">
+        <div class="sidebar">
+          <div class="card">
+            <h2 class="card-title">Placement Prediction</h2>
+            <div class="progress-item">
+              <div class="progress-header">
+                <span class="progress-label">Overall Score</span>
+                <span class="progress-value">78%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 78%"></div>
+              </div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-header">
+                <span class="progress-label">Technical Skills</span>
+                <span class="progress-value">82%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 82%"></div>
+              </div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-header">
+                <span class="progress-label">Soft Skills</span>
+                <span class="progress-value">74%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 74%"></div>
+              </div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-header">
+                <span class="progress-label">Experience</span>
+                <span class="progress-value">65%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 65%"></div>
+              </div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-header">
+                <span class="progress-label">Projects</span>
+                <span class="progress-value">85%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 85%"></div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card">
+            <h2 class="card-title">Skills <a href="#">Manage</a></h2>
+            <div class="skills-container">
+              <div class="skill-tag highlight">Python</div>
+              <div class="skill-tag highlight">Java</div>
+              <div class="skill-tag highlight">SQL</div>
+              <div class="skill-tag">HTML/CSS</div>
+              <div class="skill-tag">JavaScript</div>
+              <div class="skill-tag">React</div>
+              <div class="skill-tag">Node.js</div>
+              <div class="skill-tag">Data Analysis</div>
+              <div class="skill-tag">Machine Learning</div>
+              <div class="skill-tag">Problem Solving</div>
+              <div class="skill-tag">Team Leadership</div>
+              <div class="skill-tag missing">+ Cloud Computing</div>
+              <div class="skill-tag missing">+ Docker</div>
+            </div>
+          </div>
+          
+          <div class="card">
+            <h2 class="card-title">Recent Activity</h2>
+            <div class="activity-item">
+              <div class="activity-icon">📄</div>
+              <div class="activity-content">
+                <h3 class="activity-title">Resume Updated</h3>
+                <p class="activity-time">2 days ago</p>
+              </div>
+              <div class="activity-line"></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">🏆</div>
+              <div class="activity-content">
+                <h3 class="activity-title">New Certification Added</h3>
+                <p class="activity-time">1 week ago</p>
+              </div>
+              <div class="activity-line"></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">💼</div>
+              <div class="activity-content">
+                <h3 class="activity-title">New Job Experience Added</h3>
+                <p class="activity-time">2 weeks ago</p>
+              </div>
+              <div class="activity-line"></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">📊</div>
+              <div class="activity-content">
+                <h3 class="activity-title">Profile Report Generated</h3>
+                <p class="activity-time">1 month ago</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="main-panel">
+          <div class="recommendations">
+            <div class="card">
+              <h2 class="card-title">Improvement Recommendations</h2>
+              
+              <div class="recommendation-item">
+                <div class="recommendation-icon">🚀</div>
+                <div class="recommendation-content">
+                  <h3 class="recommendation-title">Add Cloud Computing Experience</h3>
+                  <p class="recommendation-description">Adding cloud computing skills like AWS or Azure would increase your placement chances by 15%. This skill is in high demand for software development roles.</p>
+                  <a href="#" class="recommendation-action">Explore AWS courses →</a>
+                </div>
+              </div>
+              
+              <div class="recommendation-item">
+                <div class="recommendation-icon">📝</div>
+                <div class="recommendation-content">
+                  <h3 class="recommendation-title">Enhance Project Descriptions</h3>
+                  <p class="recommendation-description">Your project descriptions could benefit from more quantifiable achievements and technical details. This would make your resume more impactful.</p>
+                  <a href="#" class="recommendation-action">See examples →</a>
+                </div>
+              </div>
+              
+              <div class="recommendation-item">
+                <div class="recommendation-icon">🏆</div>
+                <div class="recommendation-content">
+                  <h3 class="recommendation-title">Add Containerization Skills</h3>
+                  <p class="recommendation-description">Skills like Docker and Kubernetes are trending in job requirements. Adding these can make your profile stand out.</p>
+                  <a href="#" class="recommendation-action">Find Docker resources →</a>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card">
+              <h2 class="card-title">Placement Trends</h2>
+              <p>How your profile compares to successfully placed candidates with similar backgrounds</p>
+              
+              <div class="placement-chart">
+                <div class="chart-bar" style="height: 65%;">
+                  <div class="chart-label">Experience</div>
+                </div>
+                <div class="chart-bar" style="height: 78%;">
+                  <div class="chart-label">Overall</div>
+                </div>
+                <div class="chart-bar" style="height: 85%;">
+                  <div class="chart-label">Projects</div>
+                </div>
+                <div class="chart-bar" style="height: 82%;">
+                  <div class="chart-label">Tech Skills</div>
+                </div>
+                <div class="chart-bar" style="height: 74%;">
+                  <div class="chart-label">Soft Skills</div>
+                </div>
+                <div class="chart-bar" style="height: 70%;">
+                  <div class="chart-label">Avg. Placed</div>
+                </div>
+              </div>
+              
+              <p style="font-size: 0.9rem; color: var(--text-gray);">Your overall profile score of 78% is higher than 65% of successfully placed candidates in your field. Your project quality is particularly strong.</p>
+            </div>
+            
+            <div class="card">
+              <h2 class="card-title">Recommended Companies</h2>
+              <p>Based on your skills and experience</p>
+              
+              <div class="company-suggestions">
+                <div class="company-card">
+                  <div class="company-header">
+                    <div class="company-logo">TC</div>
+                    <div class="company-info">
+                      <h3>TechCorp</h3>
+                      <p>Software Developer</p>
+                    </div>
+                  </div>
+                  <div class="company-match">
+                    <span>Match Score</span>
+                    <span class="match-score">92%</span>
+                  </div>
+                  <div class="company-actions">
+                    <a href="#" class="company-action primary">View Details</a>
+                    <a href="#" class="company-action secondary">Save</a>
+                  </div>
+                </div>
+                
+                <div class="company-card">
+                  <div class="company-header">
+                    <div class="company-logo">IN</div>
+                    <div class="company-info">
+                      <h3>InnovateAI</h3>
+                      <p>Junior Developer</p>
+                    </div>
+                  </div>
+                  <div class="company-match">
+                    <span>Match Score</span>
+                    <span class="match-score">85%</span>
+                  </div>
+                  <div class="company-actions">
+                    <a href="#" class="company-action primary">View Details</a>
+                    <a href="#" class="company-action secondary">Save</a>
+                  </div>
+                </div>
+                
+                <div class="company-card">
+                  <div class="company-header">
+                    <div class="company-logo">DS</div>
+                    <div class="company-info">
+                      <h3>DataSphere</h3>
+                      <p>Data Analyst</p>
+                    </div>
+                  </div>
+                  <div class="company-match">
+                    <span>Match Score</span>
+                    <span class="match-score">78%</span>
+                  </div>
+                  <div class="company-actions">
+                    <a href="#" class="company-action primary">View Details</a>
+                    <a href="#" class="company-action secondary">Save</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <footer id="contact">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3 class="footer-title">ResumeAI</h3>
+          <p>Empowering job seekers with AI-driven insights and recommendations to boost their career opportunities.</p>
+          <div class="social-links">
+            <a href="#" class="social-icon">f</a>
+            <a href="#" class="social-icon">in</a>
+            <a href="#" class="social-icon">t</a>
+            <a href="#" class="social-icon">ig</a>
+          </div>
+        </div>
+        <div class="footer-section">
+          <h3 class="footer-title">Quick Links</h3>
+          <ul class="footer-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="profile.html">Profile</a></li>
+            <li><a href="report.html">Report</a></li>
+            <li><a href="analyze.html">Analyze Resume</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3 class="footer-title">Resources</h3>
+          <ul class="footer-links">
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Career Tips</a></li>
+            <li><a href="#">Resume Templates</a></li>
+            <li><a href="#">API Documentation</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3 class="footer-title">Contact Us</h3>
+          <ul class="footer-links">
+            <li>Email: info@resumeai.com</li>
+            <li>Phone: +1 (123) 456-7890</li>
+            <li>Address: 123 AI Street, Tech City</li>
+          </ul>
+        </div>
+      </div>
+      <div class="copyright">
+        <p>&copy; 2025 ResumeAI. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placement Predictor</title>
+    <style>
+        :root {
+            --purple-dark: #4a148c;
+            --purple-main: #7b1fa2;
+            --purple-light: #9c27b0;
+            --purple-accent: #e1bee7;
+            --black: #212121;
+            --black-light: #424242;
+            --white: #ffffff;
+            --light-gray: #f5f5f5;
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+
+
+        
+        body {
+            background: linear-gradient(135deg, #2d1e41 0%, #1a1a1a 100%);
+            color: var(--white);
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .blur-circle {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+        }
+        
+        .blur-1 {
+            background: rgba(156, 39, 176, 0.2);
+            width: 30vw;
+            height: 30vw;
+            top: -5vw;
+            right: -5vw;
+        }
+        
+        .blur-2 {
+            background: rgba(106, 27, 154, 0.15);
+            width: 40vw;
+            height: 40vw;
+            bottom: -10vw;
+            left: -10vw;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(74, 20, 140, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--white);
+            text-decoration: none;
+            letter-spacing: 1px;
+            position: relative;
+        }
+        
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 40%;
+            height: 3px;
+            background: var(--purple-accent);
+            border-radius: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--purple-accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--purple-accent);
+            transform: translateY(-2px);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--purple-dark), var(--purple-main));
+            color: var(--white);
+            padding: 2rem 0;
+            text-align: center;
+            border-radius: 12px;
+            margin-top: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 25%, rgba(255, 255, 255, 0.05) 25%, 
+                                          rgba(255, 255, 255, 0.05) 50%, transparent 50%, 
+                                          transparent 75%, rgba(255, 255, 255, 0.05) 75%);
+            background-size: 30px 30px;
+            animation: moveBackground 20s linear infinite;
+        }
+        
+        @keyframes moveBackground {
+            from { background-position: 0 0; }
+            to { background-position: 60px 60px; }
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 2;
+        }
+        
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .card {
+            background: rgba(40, 40, 45, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-header {
+            background: linear-gradient(to right, var(--purple-dark), var(--purple-main));
+            color: var(--white);
+            padding: 1.25rem 1.5rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 80px;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1));
+        }
+        
+        .card-body {
+            padding: 2rem;
+        }
+        
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--white);
+        }
+        
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 0.85rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            font-size: 1rem;
+            color: var(--white);
+            transition: all 0.3s;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        input[type="file"] {
+            width: 100%;
+            padding: 0.85rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            font-size: 1rem;
+            color: var(--white);
+            cursor: pointer;
+        }
+        
+        input[type="file"]::file-selector-button {
+            background: var(--purple-main);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            margin-right: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        input[type="file"]::file-selector-button:hover {
+            background: var(--purple-dark);
+        }
+        
+        input[type="text"]:focus,
+        input[type="file"]:focus,
+        input[type="number"]:focus {
+            border-color: var(--purple-light);
+            outline: none;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(to right, var(--purple-main), var(--purple-light));
+            color: var(--white);
+            border: none;
+            padding: 0.85rem 1.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            align-self: flex-start;
+            box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(to right, var(--purple-dark), var(--purple-main));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(156, 39, 176, 0.4);
+        }
+        
+        .btn:hover::after {
+            left: 100%;
+        }
+        
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        .skill-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .skill-item input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            margin-right: 0.75rem;
+            position: relative;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .skill-item input[type="checkbox"]:checked {
+            background-color: var(--purple-light);
+            border-color: var(--purple-light);
+        }
+        
+        .skill-item input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 0.7rem;
+        }
+        
+        .skill-item input[type="checkbox"]:hover {
+            border-color: var(--purple-accent);
+        }
+        
+        .resume-preview {
+            background: rgba(30, 30, 35, 0.7);
+            backdrop-filter: blur(5px);
+            padding: 1.25rem;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+            color: #e0e0e0;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .result-container {
+            padding: 2rem;
+        }
+        
+        .prediction-box {
+            background: linear-gradient(135deg, rgba(106, 27, 154, 0.2), rgba(156, 39, 176, 0.1));
+            backdrop-filter: blur(10px);
+            border-left: 5px solid var(--purple-light);
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+            border-radius: 0 12px 12px 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .prediction-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--purple-accent);
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .profile-summary {
+            background: rgba(30, 30, 35, 0.5);
+            backdrop-filter: blur(5px);
+            padding: 1.75rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .profile-summary h3 {
+            margin-bottom: 1.25rem;
+            color: var(--purple-accent);
+            font-size: 1.4rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .profile-summary h3::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--purple-light);
+            border-radius: 2px;
+        }
+        
+        .profile-summary ul {
+            list-style-type: none;
+        }
+        
+        .profile-summary li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+        }
+        
+        .profile-summary li strong {
+            color: var(--purple-accent);
+            margin-right: 0.5rem;
+            min-width: 100px;
+        }
+        
+        .profile-summary li:last-child {
+            border-bottom: none;
+        }
+        
+        .separator {
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+            margin: 2.5rem 0;
+        }
+        
+        /* Chart Styles */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .chart-box {
+            background: rgba(40, 40, 45, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .chart-box:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .chart-box h4 {
+            color: var(--purple-accent);
+            margin-bottom: 1.25rem;
+            text-align: center;
+            font-size: 1.2rem;
+            position: relative;
+        }
+        
+        .chart-box h4::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 2px;
+            background: var(--purple-main);
+        }
+
+        .chart-wrapper {
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(30, 30, 35, 0.7);
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .chart-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.5));
+        }
+
+        .no-chart {
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            font-style: italic;
+        }
+
+        /* Recommendations Styles */
+        .recommendations {
+            margin-top: 2.5rem;
+            background: linear-gradient(135deg, rgba(74, 20, 140, 0.2), rgba(106, 27, 154, 0.1));
+            backdrop-filter: blur(5px);
+            border-left: 4px solid var(--purple-light);
+            padding: 1.75rem;
+            border-radius: 0 12px 12px 0;
+            position: relative;
+            overflow: hidden;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .recommendations h3 {
+            color: var(--purple-accent);
+            margin-bottom: 1.25rem;
+            font-size: 1.4rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .recommendations h3::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--purple-light);
+            border-radius: 2px;
+        }
+
+        .recommendation-list li {
+            margin-bottom: 1rem;
+            position: relative;
+            padding-left: 1.75rem;
+            animation: fadeIn 0.5s ease forwards;
+            opacity: 0;
+        }
+        
+        .recommendation-list li:nth-child(1) { animation-delay: 0.1s; }
+        .recommendation-list li:nth-child(2) { animation-delay: 0.3s; }
+        .recommendation-list li:nth-child(3) { animation-delay: 0.5s; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .recommendation-list li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--purple-accent);
+            font-weight: bold;
+        }
+        
+        footer {
+            background: rgba(33, 33, 33, 0.7);
+            backdrop-filter: blur(10px);
+            color: var(--white);
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 3rem;
+            position: relative;
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, var(--purple-dark), var(--purple-light), var(--purple-dark));
+        }
+        
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            
+            .logo {
+                margin-bottom: 1rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem 1.5rem;
+            }
+            
+            .skills-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-wrapper {
+                height: 200px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 30, 35, 0.5);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--purple-main);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--purple-light);
+        }
+        
+        input[type="text"],
+        input[type="file"],
+        input[type="number"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--medium-gray);
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        input[type="file"]:focus,
+        input[type="number"]:focus {
+            border-color: var(--purple-light);
+            outline: none;
+        }
+        
+        
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="#" class="logo">ResumeAI</a>
+        <div class="nav-links">
+            <a href="/input">Placement Prediction</a>
+            <a href="/profile">View Profile</a>
+            <a href="/report">Report</a>
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#contact">Contact</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>Placement Predictor</h1>
+            <p>Analyze your profile and predict your placement opportunities</p>
+        </header>
+
+        <!-- 1. Upload Resume -->
+        <div class="card">
+            <div class="card-header">1. Upload Your Resume</div>
+            <div class="card-body">
+                <form action="/upload" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="resume">Select Resume (PDF):</label>
+                        <input type="file" name="resume" id="resume" accept=".pdf" required>
+                    </div>
+                    <button type="submit" class="btn">Upload Resume</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 2. Extracted Resume Text -->
+        {% if resume_text %}
+        <div class="card">
+            <div class="card-header">2. Review Extracted Information</div>
+            <div class="card-body">
+                <h3>Extracted Resume Text</h3>
+                <div class="resume-preview">{{ resume_text }}</div>
+                <form action="/input" method="GET" style="margin-top: 1.5rem;">
+                    <button type="submit" class="btn">Continue to Next Step</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 3. Input Details -->
+        {% if show_input %}
+        <div class="card">
+            <div class="card-header">3. Enter Your Academic & Project Details</div>
+            <div class="card-body">
+                <form action="/result" method="POST">
+                    <div class="form-group">
+                        <label for="cgpa">CGPA:</label>
+                        <input type="number" name="cgpa" id="cgpa" required placeholder="Enter your CGPA" min="0" max="10" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="internships">Number of Internships:</label>
+                        <input type="number" name="internships" id="internships" required min="0" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="projects">Number of Projects:</label>
+                        <input type="number" name="projects" id="projects" required min="0" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Skills (Check all that apply):</label>
+                        <div class="skills-grid">
+                            <div class="skill-item">
+                                <input type="checkbox" name="skills" id="python" value="Python">
+                                <label for="python">Python</label>
+                            </div>
+                            <div class="skill-item">
+                                <input type="checkbox" name="skills" id="java" value="Java">
+                                <label for="java">Java</label>
+                            </div>
+                            <div class="skill-item">
+                                <input type="checkbox" name="skills" id="javascript" value="JavaScript">
+                                <label for="javascript">JavaScript</label>
+                            </div>
+                            <div class="skill-item">
+                                <input type="checkbox" name="skills" id="html_css" value="HTML/CSS">
+                                <label for="html_css">HTML/CSS</label>
+                            </div>
+                            <div class="skill-item">
+                                <input type="checkbox" name="skills" id="sql" value="SQL">
+                                <label for="sql">SQL</label>
+                            </div>
+                            <div class="skill-item">
+                                <input type="checkbox" name="skills" id="ml" value="Machine Learning">
+                                <label for="ml">Machine Learning</label>
+                            </div>
+                            <div class="skill-item">
+                                <input type="checkbox" name="skills" id="data_analytics" value="Data Analytics">
+                                <label for="data_analytics">Data Analytics</label>
+                            </div>
+                            <div class="skill-item">
+                                <input type="checkbox" name="skills" id="cloud" value="Cloud Computing">
+                                <label for="cloud">Cloud Computing</label>
+                            </div>
+                            <div class="skill-item">
+                                <input type="checkbox" name="skills" id="mobile_dev" value="Mobile Development">
+                                <label for="mobile_dev">Mobile Development</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">Predict Placement Opportunities</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 4. Placement Prediction Result -->
+        {% if prediction %}
+        <div class="card">
+            <div class="card-header">4. Your Placement Prediction</div>
+            <div class="card-body">
+                <h3>Placement Prediction Result</h3>
+                <div class="prediction-box">
+                    <div class="prediction-value">{{ prediction }}</div>
+                    <p><strong>Probability of Placement:</strong> {{ proba }}%</p>
+                </div>
+
+                <div class="profile-summary">
+                    <h3>Your Profile Summary</h3>
+                    <ul>
+                        <li><strong>CGPA:</strong> {{ cgpa }}</li>
+                        <li><strong>Internships:</strong> {{ internships }}</li>
+                        <li><strong>Projects:</strong> {{ projects }}</li>
+                        <li><strong>Skills:</strong> {{ skills | join(', ') }}</li>
+                    </ul>
+                </div>
+                
+                <div class="separator"></div>
+                
+                <h3>Performance Analysis</h3>
+                
+                <!-- Charts Section -->
+                <div class="charts-container">
+                    <!-- Skills Distribution Chart -->
+                    <div class="chart-box">
+                        <h4>Skills Distribution</h4>
+                        <div class="chart-wrapper">
+                            {% if charts.skills_chart %}
+                            <img src="{{ url_for('static', filename=charts.skills_chart.split('static/')[-1]) }}" alt="Skills Distribution" class="chart-image">
+                            {% else %}
+                            <p class="no-chart">Skills distribution chart not available.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- CGPA Comparison Chart -->
+                    <div class="chart-box">
+                        <h4>CGPA Comparison</h4>
+                        <div class="chart-wrapper">
+                            {% if charts.cgpa_chart %}
+                            <img src="{{ url_for('static', filename=charts.cgpa_chart.split('static/')[-1]) }}" alt="CGPA Comparison" class="chart-image">
+                            {% else %}
+                            <p class="no-chart">CGPA comparison chart not available.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Internship & Project Impact Chart -->
+                    <div class="chart-box">
+                        <h4>Experience Impact</h4>
+                        <div class="chart-wrapper">
+                            {% if charts.experience_chart %}
+                            <img src="{{ url_for('static', filename=charts.experience_chart.split('static/')[-1]) }}" alt="Experience Impact" class="chart-image">
+                            {% else %}
+                            <p class="no-chart">Experience impact chart not available.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Improvement Recommendations -->
+                <div class="recommendations">
+                    <h3>Improvement Recommendations</h3>
+                    <ul class="recommendation-list">
+                        {% if recommendations %}
+                            {% for rec in recommendations %}
+                            <li>{{ rec }}</li>
+                            {% endfor %}
+                        {% else %}
+                        <li>Focus on improving your technical skills in high-demand areas.</li>
+                        <li>Consider taking on more projects to showcase your applied knowledge.</li>
+                        <li>Try to secure internships in relevant industries.</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Footer Section -->
+        <footer class="card" style="background-color: var(--purple-dark); color: var(--white); text-align: center; padding: 1.5rem;">
+            <p>© 2025 ResumeAI - Placement Predictor | All Rights Reserved</p>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem;">An AI-powered tool to help students analyze and improve their placement opportunities</p>
+        </footer>
+    </div>
+</body>
+</html>

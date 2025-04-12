@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ResumeAI - Smart Resume Analysis & Career Prediction</title>
+  <style>
+    :root {
+      --primary: #6a1b9a;
+      --primary-light: #9c4dcc;
+      --primary-dark: #38006b;
+      --white: #ffffff;
+      --gray-light: #f5f5f5;
+      --gray: #e0e0e0;
+      --black: #212121;
+      --glass-bg: rgba(255, 255, 255, 0.15);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
+      color: var(--black);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    
+    .blur-circle {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      z-index: -1;
+    }
+    
+    .blur-1 {
+      background: rgba(156, 77, 204, 0.3);
+      width: 40vw;
+      height: 40vw;
+      top: -10vw;
+      left: -10vw;
+    }
+    
+    .blur-2 {
+      background: rgba(106, 27, 154, 0.2);
+      width: 50vw;
+      height: 50vw;
+      bottom: -15vw;
+      right: -15vw;
+    }
+    
+    header {
+      background: linear-gradient(to right, var(--primary-dark), var(--primary));
+      color: var(--white);
+      padding: 1.5rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--white);
+      text-decoration: none;
+      position: relative;
+    }
+    
+    .logo::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 40%;
+      height: 3px;
+      background: var(--white);
+      border-radius: 10px;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+    
+    .nav-links a {
+      color: var(--white);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .nav-links a:hover {
+      color: var(--gray);
+      transform: translateY(-2px);
+    }
+    
+    .glass-btn {
+      background: var(--glass-bg);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--glass-border);
+      color: var(--white);
+      padding: 0.8rem 1.5rem;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: var(--glass-shadow);
+    }
+    
+    .glass-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2rem 0 4rem;
+    }
+    
+    .hero-content {
+      flex: 1;
+      padding-right: 2rem;
+    }
+    
+    .hero-title {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+    
+    .hero-subtitle {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+    }
+    
+    .features {
+      padding: 5rem 0;
+      position: relative;
+    }
+    
+    .section-title {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 3rem;
+      color: var(--primary-dark);
+      position: relative;
+    }
+    
+    .section-title::after {
+      content: '';
+      display: block;
+      width: 80px;
+      height: 4px;
+      background: var(--primary);
+      margin: 15px auto 0;
+      border-radius: 2px;
+    }
+    
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 2rem;
+      box-shadow: var(--glass-shadow);
+      border: 1px solid var(--glass-border);
+      transition: all 0.3s ease;
+    }
+    
+    .glass-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      background: rgba(156, 77, 204, 0.2);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(156, 77, 204, 0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+    }
+    
+    .feature-title {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+    
+    .how-it-works {
+      padding: 5rem 0;
+    }
+    
+    .steps {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 3rem;
+      flex-wrap: wrap;
+    }
+    
+    .step {
+      flex: 1;
+      min-width: 240px;
+      text-align: center;
+      padding: 0 1rem;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 25px;
+      right: -15%;
+      width: 30%;
+      height: 2px;
+      background: var(--primary-light);
+      display: none;
+    }
+    
+    @media (min-width: 1000px) {
+      .step:not(:last-child)::after {
+        display: block;
+      }
+    }
+    
+    .step-number {
+      width: 50px;
+      height: 50px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      color: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      box-shadow: var(--glass-shadow);
+    }
+    
+    .upload-area {
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      border: 1px dashed var(--primary);
+      border-radius: 15px;
+      padding: 3rem 2rem;
+      text-align: center;
+      margin-top: 2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: var(--glass-shadow);
+    }
+    
+    .upload-area:hover {
+      border-color: var(--primary-light);
+      background: rgba(106, 27, 154, 0.1);
+      transform: scale(1.02);
+    }
+    
+    .cta-section {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: var(--white);
+      padding: 5rem 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .cta-content {
+      max-width: 700px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    
+    footer {
+      background-color: var(--black);
+      color: var(--white);
+      padding: 3rem 0;
+    }
+    
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+    
+    .footer-section {
+      flex: 1;
+      min-width: 240px;
+    }
+    
+    .social-links {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    
+    .social-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(5px);
+      border: 1px solid var(--glass-border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      color: var(--white);
+    }
+    
+    .social-icon:hover {
+      background: var(--primary-light);
+      transform: translateY(-3px);
+    }
+    
+    @media (max-width: 768px) {
+      .hero, .nav-links {
+        flex-direction: column;
+      }
+      .hero-content {
+        padding-right: 0;
+        margin-bottom: 2rem;
+      }
+      .nav-links {
+        display: none;
+      }
+      .steps {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="blur-circle blur-1"></div>
+  <div class="blur-circle blur-2"></div>
+
+  <header>
+    <div class="container">
+      <nav>
+        <a href="#" class="logo">ResumeAI</a>
+        <div class="nav-links">
+          <a href="/input">Placement Prediction</a>
+          <a href="/Dashboard">Dashboard</a>
+          <a href="/analysis_result">Resume Analysis</a>
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How It Works</a>
+        </div>
+        <button class="glass-btn">Get Started</button>
+      </nav>
+      
+      <div class="hero">
+        <div class="hero-content">
+          <h1 class="hero-title">Unlock Your Career Potential with AI-Powered Resume Analysis</h1>
+          <p class="hero-subtitle">Our advanced system analyzes your resume, predicts placement success, and provides personalized recommendations to help you land your dream job.</p>
+          <button class="glass-btn">Upload Your Resume</button>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <section class="features" id="features">
+    <div class="container">
+      <h2 class="section-title">Powerful Features</h2>
+      <div class="feature-grid">
+        <div class="glass-card">
+          <div class="feature-icon">📊</div>
+          <h3 class="feature-title">Smart Resume Analysis</h3>
+          <p class="feature-description">Our AI extracts key information from your resume including skills, academic performance, experience, and projects.</p>
+        </div>
+        <div class="glass-card">
+          <div class="feature-icon">🔮</div>
+          <h3 class="feature-title">Placement Prediction</h3>
+          <p class="feature-description">Using machine learning algorithms to predict your placement chances based on your profile and market trends.</p>
+        </div>
+        <div class="glass-card">
+          <div class="feature-icon">📈</div>
+          <h3 class="feature-title">Detailed Reports</h3>
+          <p class="feature-description">Get comprehensive insights with visualizations highlighting strengths, weaknesses, and improvement areas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <section class="how-it-works" id="how-it-works">
+    <div class="container">
+      <h2 class="section-title">How It Works</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3 class="feature-title">Upload Resume</h3>
+          <p>Upload your resume in PDF or DOC format to our secure platform.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3 class="feature-title">AI Analysis</h3>
+          <p>Our system analyzes your resume using advanced NLP techniques.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3 class="feature-title">Get Insights</h3>
+          <p>Receive detailed reports and visualizations of your profile strengths.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">4</div>
+          <h3 class="feature-title">Take Action</h3>
+          <p>Follow recommendations to improve your resume and enhance placement chances.</p>
+        </div>
+      </div>
+      
+      <div class="upload-area">
+        <div class="feature-icon" style="margin: 0 auto 1.5rem;">📄</div>
+        <h3>Drag & Drop Your Resume Here</h3>
+        <p>or click to browse files (PDF, DOC, DOCX)</p>
+      </div>
+    </div>
+  </section>
+  
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2 class="section-title" style="color: var(--white);">Ready to Transform Your Job Search?</h2>
+        <p style="margin-bottom: 2rem;">Join thousands of job seekers who have improved their placement chances with our AI-powered platform.</p>
+        <div style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;">
+          <button class="glass-btn">Get Started For Free</button>
+          <button class="glass-btn" style="background: transparent;">View Demo</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem;">ResumeAI</h3>
+          <p>Empowering job seekers with AI-driven insights to boost their career opportunities.</p>
+          <div class="social-links">
+            <a href="#" class="social-icon">f</a>
+            <a href="#" class="social-icon">in</a>
+            <a href="#" class="social-icon">t</a>
+          </div>
+        </div>
+        <div class="footer-section">
+          <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem;">Links</h3>
+          <ul style="list-style: none;">
+            <li style="margin-bottom: 0.8rem;"><a href="#" style="color: var(--gray); text-decoration: none; transition: all 0.3s ease;">Home</a></li>
+            <li style="margin-bottom: 0.8rem;"><a href="#features" style="color: var(--gray); text-decoration: none; transition: all 0.3s ease;">Features</a></li>
+            <li style="margin-bottom: 0.8rem;"><a href="#how-it-works" style="color: var(--gray); text-decoration: none; transition: all 0.3s ease;">How It Works</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem;">Contact</h3>
+          <p>Email: info@resumeai.com</p>
+          <p>Phone: +1 (123) 456-7890</p>
+          <p>Address: 123 AI Street, Tech City</p>
+        </div>
+      </div>
+      <div style="text-align: center; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1); color: var(--gray);">
+        <p>&copy; 2025 ResumeAI. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

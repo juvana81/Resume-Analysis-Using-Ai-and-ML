@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Analysis Results</title>
+    <style>
+        :root {
+            --primary: #6200EA;
+            --primary-light: #7C4DFF;
+            --primary-dark: #4A148C;
+            --accent: #B388FF;
+            --black: #121212;
+            --dark-gray: #212121;
+            --medium-gray: #424242;
+            --light-gray: #F5F5F5;
+            --white: #FFFFFF;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: var(--black);
+            color: var(--white);
+        }
+        
+        h1, h2, h3 {
+            color: var(--white);
+            font-weight: 600;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 30px;
+            color: var(--white);
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            border-radius: 2px;
+        }
+        
+        .container {
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+            background-color: var(--dark-gray);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .score-container {
+            text-align: center;
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .score-circle {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            background: conic-gradient(var(--primary) calc(var(--score) * 3.6deg), var(--dark-gray) 0deg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        
+        .score-circle::before {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-color: var(--black);
+            border-radius: 50%;
+        }
+        
+        .score {
+            position: relative;
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--white);
+            z-index: 1;
+        }
+        
+        .score-label {
+            font-size: 16px;
+            font-weight: 500;
+            margin-top: 5px;
+            color: var(--accent);
+        }
+        
+        .section {
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            border-bottom: 1px solid var(--medium-gray);
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 8px;
+        }
+        
+        ul {
+            padding-left: 20px;
+            margin-top: 12px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            border-bottom: 1px solid var(--medium-gray);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .nav-tabs li {
+            margin-right: 5px;
+            margin-bottom: 0;
+        }
+        
+        .nav-tabs a {
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--white);
+            background-color: var(--medium-gray);
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tabs a.active {
+            background-color: var(--primary);
+            color: var(--white);
+            font-weight: 600;
+        }
+        
+        .nav-tabs a:hover:not(.active) {
+            background-color: var(--primary-dark);
+        }
+        
+        .tab-content {
+            padding: 24px;
+            border: 1px solid var(--medium-gray);
+            border-top: none;
+            background-color: var(--dark-gray);
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .btn {
+            background: linear-gradient(to right, var(--primary), var(--primary-light));
+            color: var(--white);
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:hover {
+            background: linear-gradient(to right, var(--primary-dark), var(--primary));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            background-color: var(--primary-light);
+            color: var(--white);
+        }
+        
+        .tag {
+            display: inline-block;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 14px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .skill-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .card-header h3 {
+            margin: 0;
+        }
+        
+        .card-header i {
+            margin-right: 12px;
+            color: var(--primary-light);
+            font-size: 20px;
+        }
+        
+        pre {
+            white-space: pre-wrap;
+            font-family: inherit;
+            background-color: var(--medium-gray);
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-wrap: nowrap;
+            }
+            
+            .nav-tabs a {
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <h1>Resume Analysis Results</h1>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <div class="container">
+        <div class="score-container">
+            <div class="score-circle" style="--score: {{ result.ats_score }}">
+                <div class="score">{{ result.ats_score }}</div>
+            </div>
+            <div class="score-label">ATS COMPATIBILITY SCORE</div>
+            <h3>How well your resume performs with Applicant Tracking Systems</h3>
+        </div>
+        
+        <ul class="nav-tabs">
+            <li><a href="#summary" class="active" onclick="showTab('summary', event)"><i class="fas fa-chart-bar"></i> Summary</a></li>
+            <li><a href="#improvements" onclick="showTab('improvements', event)"><i class="fas fa-tools"></i> Improvements</a></li>
+            <li><a href="#career-path" onclick="showTab('career-path', event)"><i class="fas fa-road"></i> Career Path</a></li>
+            <li><a href="#original-resume" onclick="showTab('original-resume', event)"><i class="fas fa-file-alt"></i> Original Resume</a></li>
+        </ul>
+        
+        <div class="tab-content">
+            <div id="summary" class="tab-pane active">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-star"></i>
+                        <h3>Resume Strengths</h3>
+                    </div>
+                    {% if result.strengths %}
+                        <ul>
+                            {% for strength in result.strengths %}
+                                <li>{{ strength }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No strengths analysis available.</p>
+                    {% endif %}
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-info-circle"></i>
+                        <h3>Key Information Extracted</h3>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-user"></i> Personal Details</div>
+                        {% if result.key_information.personal_details %}
+                            <ul>
+                                {% for detail in result.key_information.personal_details %}
+                                    <li>{{ detail }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No personal details found.</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-graduation-cap"></i> Education</div>
+                        {% if result.key_information.education %}
+                            <ul>
+                                {% for education in result.key_information.education %}
+                                    <li>{{ education }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No education information found.</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-code"></i> Skills</div>
+                        {% if result.key_information.skills %}
+                            <div class="skill-container">
+                                {% for skill in result.key_information.skills %}
+                                    <span class="tag">{{ skill }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p>No skills information found.</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-briefcase"></i> Experience</div>
+                        {% if result.key_information.experience %}
+                            <ul>
+                                {% for experience in result.key_information.experience %}
+                                    <li>{{ experience }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No experience information found.</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-project-diagram"></i> Projects</div>
+                        {% if result.key_information.projects %}
+                            <ul>
+                                {% for project in result.key_information.projects %}
+                                    <li>{{ project }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No project information found.</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-key"></i>
+                        <h3>Keyword Optimization</h3>
+                    </div>
+                    {% if result.keywords %}
+                        <div class="skill-container">
+                            {% for keyword in result.keywords %}
+                                <span class="tag">{{ keyword }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>No keyword optimization available.</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div id="improvements" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-tools"></i>
+                        <h3>Improvement Opportunities</h3>
+                    </div>
+                    {% if result.improvements %}
+                        <ul>
+                            {% for improvement in result.improvements %}
+                                <li>{{ improvement }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No improvement suggestions available.</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div id="career-path" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-briefcase"></i>
+                        <h3>Suitable Job Roles</h3>
+                    </div>
+                    {% if result.suitable_roles %}
+                        <ul>
+                            {% for role in result.suitable_roles %}
+                                <li>{{ role }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No suitable job roles available.</p>
+                    {% endif %}
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-brain"></i>
+                        <h3>Skills to Develop</h3>
+                    </div>
+                    {% if result.skills_to_develop %}
+                        <div class="skill-container">
+                            {% for skill in result.skills_to_develop %}
+                                <span class="tag">{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>No skills development suggestions available.</p>
+                    {% endif %}
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-certificate"></i>
+                        <h3>Recommended Certifications</h3>
+                    </div>
+                    {% if result.recommended_certs %}
+                        <ul>
+                            {% for cert in result.recommended_certs %}
+                                <li>{{ cert }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No certification recommendations available.</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div id="original-resume" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-file-alt"></i>
+                        <h3>Original Resume Text</h3>
+                    </div>
+                    <pre>{{ resume_text }}</pre>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-tags"></i>
+                        <h3>Detected Skills</h3>
+                    </div>
+                    {% if skills %}
+                        <div class="skill-container">
+                            {% for skill in skills %}
+                                <span class="tag">{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>No skills detected.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-center">
+        <a href="{{ url_for('analyze_page') }}" class="btn"><i class="fas fa-upload"></i> Upload Another Resume</a>
+    </div>
+    
+    <script>
+        function showTab(tabId, event) {
+            // Hide all tab panes
+            const tabPanes = document.querySelectorAll('.tab-pane');
+            tabPanes.forEach(pane => {
+                pane.classList.remove('active');
+            });
+            
+            // Show the selected tab pane
+            document.getElementById(tabId).classList.add('active');
+            
+            // Update active tab link
+            const tabLinks = document.querySelectorAll('.nav-tabs a');
+            tabLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // If event exists, set the clicked link as active
+            if (event) {
+                event.currentTarget.classList.add('active');
+            }
+        }
+        
+        // Set the score animation dynamically
+        document.addEventListener('DOMContentLoaded', function() {
+            const scoreCircle = document.querySelector('.score-circle');
+            if (scoreCircle) {
+                const score = parseInt(document.querySelector('.score').textContent);
+                scoreCircle.style.setProperty('--score', score);
+            }
+        });
+    </script>
+</body>
+</html>

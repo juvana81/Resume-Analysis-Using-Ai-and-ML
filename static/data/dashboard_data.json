@@ -1,0 +1,56 @@
+{
+    "stats": {
+        "total_students": 401,
+        "placed_students": 199,
+        "avg_cgpa": 8.47,
+        "with_internships": 229,
+        "with_projects": 296,
+        "placement_rate": 49.6
+    },
+    "cgpa_distribution": {
+        "5.0-6.0": 2,
+        "6.1-7.0": 3,
+        "7.1-8.0": 147,
+        "8.1-9.0": 162,
+        "9.1-10.0": 86
+    },
+    "skills_data": {
+        "PYTHON": 3,
+        "JAVA": 1,
+        "SQL": 2,
+        "ML": 1,
+        "AI": 1,
+        "HTML": 2,
+        "CSS": 2,
+        "C++": 0,
+        "REACT": 0,
+        "NODEJS": 0
+    },
+    "placement_by_cgpa": {
+        "5.0-6.0": 50.0,
+        "6.1-7.0": 66.7,
+        "7.1-8.0": 51.0,
+        "8.1-9.0": 45.7,
+        "9.1-10.0": 54.7
+    },
+    "internship_vs_placement": {
+        "with_internship": {
+            "placed": 112,
+            "not_placed": 117
+        },
+        "without_internship": {
+            "placed": 87,
+            "not_placed": 85
+        }
+    },
+    "projects_vs_placement": {
+        "with_projects": {
+            "placed": 197,
+            "not_placed": 99
+        },
+        "without_projects": {
+            "placed": 2,
+            "not_placed": 103
+        }
+    }
+}
